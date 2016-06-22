@@ -1,0 +1,13 @@
+install: true
+language: java
+sudo: false
+script:
+- ./gradlew clean build
+cache:
+  directories:
+  - $HOME/.gradle
+jdk:
+- oraclejdk8
+env:
+  global:
+  - TERM=dumb
