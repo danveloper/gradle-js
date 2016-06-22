@@ -107,4 +107,37 @@ class JsBuildPluginSpec extends PluginSpecification {
     result.output.contains("doLast worked")
     result.task(":myTask").outcome == TaskOutcome.SUCCESS
   }
+
+  void 'should allow loading of additional js files from project'() {
+    setup:
+    def project = buildJs("""
+      project.task('myTask', function(task) {
+        task.action(function(task) {
+          print(foo);
+        });
+      });
+    """)
+    project.file("scripts").mkdir()
+    new File(project.file("scripts"), "foo.js") << "foo = 'bar';"
+    project.file("build.gradle") << """
+      plugins {
+        id 'js-build'
+      }
+      jsbuild {
+        println "scripts"
+        scripts = file("scripts")
+      }
+    """
+
+    when:
+    def result = GradleRunner.create()
+        .withProjectDir(project.projectDir)
+        .withArguments("myTask")
+        .withPluginClasspath()
+        .withDebug(true)
+        .build()
+
+    then:
+    result.output.contains("bar")
+  }
 }

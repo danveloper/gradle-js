@@ -34,11 +34,25 @@ public class JsBuildPlugin implements Plugin<Project> {
 
   @Override
   public void apply(Project project) {
+    JsBuildExtension extension = (JsBuildExtension)project.extensions.create("jsbuild", JsBuildExtension, project)
+
     bindings.put("project", new BetterProject(project));
     engine.setBindings(bindings, ScriptContext.GLOBAL_SCOPE);
+    if (extension.scripts && extension.scripts.directory) {
+      project.fileTree(extension.scripts.absolutePath).each { file ->
+        if (file.name.endsWith(".js")) {
+          loadScript(file)
+        }
+      }
+    }
+
     File buildScript = new File(project.getProjectDir(), "gradle.js");
+    loadScript(buildScript)
+  }
+
+  private static void loadScript(File script) {
     uncheck {
-      InputStream stream = new FileInputStream(buildScript);
+      InputStream stream = new FileInputStream(script);
       byte[] buf = uncheck0 { new byte[stream.available()] }
       stream.read(buf);
       engine.eval(new String(buf));
