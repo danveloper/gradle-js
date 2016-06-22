@@ -36,7 +36,7 @@ public class JsBuildPlugin implements Plugin<Project> {
   public void apply(Project project) {
     bindings.put("project", new BetterProject(project));
     engine.setBindings(bindings, ScriptContext.GLOBAL_SCOPE);
-    File buildScript = new File(project.getProjectDir(), "build.js");
+    File buildScript = new File(project.getProjectDir(), "gradle.js");
     uncheck {
       InputStream stream = new FileInputStream(buildScript);
       byte[] buf = uncheck0 { new byte[stream.available()] }
