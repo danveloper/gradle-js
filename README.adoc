@@ -1,5 +1,7 @@
 = Gradle JavaScript Buildscript Plugin
 
+image:https://travis-ci.org/danveloper/gradle-js.svg?branch=master["Build Status", link="https://travis-ci.org/danveloper/gradle-js"]
+
 Gradle is a wonderful build tool for building projects of all languages, shapes, and sizes. It it is built on Java, runs on the JVM, and traditionally has provided an excellent Groovy DSL for creating robust and dynamic build scripts. Recently, Gradle has also announced http://gradle.org/blog/kotlin-meets-gradle/[they will support Kotlin] as a language for constructing these build scripts.
 
 But what about supporting the most popular and least controversial language of all time? Why can't our builds have the same levels of complexity and non-deterministic failures as our front end code does? What gives, Gradle?!
