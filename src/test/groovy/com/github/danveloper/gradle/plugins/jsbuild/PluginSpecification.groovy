@@ -14,7 +14,7 @@ abstract class PluginSpecification extends Specification {
   Project buildJs(String content) {
     File projectDir = dir.newFolder()
     Project project = ProjectBuilder.builder().withProjectDir(projectDir).withName("proj").build()
-    File buildJs = new File(projectDir, 'build.js')
+    File buildJs = new File(projectDir, 'gradle.js')
     buildJs << content
     project
   }
