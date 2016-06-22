@@ -1,0 +1,122 @@
+= Gradle JavaScript Buildscript Plugin
+
+Gradle is a wonderful build tool for building projects of all languages, shapes, and sizes. It it is built on Java, runs on the JVM, and traditionally has provided an excellent Groovy DSL for creating robust and dynamic build scripts. Recently, Gradle has also announced http://gradle.org/blog/kotlin-meets-gradle/[they will support Kotlin] as a language for constructing these build scripts.
+
+But what about supporting the most popular and least controversial language of all time? Why can't our builds have the same levels of complexity and non-deterministic failures as our front end code does? What gives, Gradle?!
+
+This is why I have taken it upon myself to Make Gradle Great Again™ and provide second class support for JavaScript as a build language. Now, you can write your build logic using the same confusing bullshit you throw into your `index.html` files.
+
+== But, how?
+
+Easy as fuck.
+
+ - You still need a `build.gradle` file in your project root.
+
+.But it only needs this.
+====
+[source,groovy]
+----
+plugins {
+  id 'js-builds' version '1.0.0'
+}
+----
+====
+
+Boom that's it. (Well, it will be if I ever decide to publish this somewhere.)
+
+== Then what?
+
+JavaScript the fuck out of your project.
+
+ - You need a `build.js` file in your project root.
+
+.And this needs all the complicated JavaScript you can fathom.
+====
+[source,javascript]
+----
+project.buildscript(function(bs) { // <1>
+  bs.repositories(function(repos) { // <2>
+    repos.jcenter() // <3>
+  });
+  bs.dependencies(function(deps) {
+    deps.classpath('xml-apis:xml-apis:2.0.2') // <4>
+  });
+});
+
+project.apply({plugin: 'java'}); // <5>
+
+project.repositories(function(repos) { // <6>
+  repos.mavenCentral();
+});
+
+project.dependencies(function(deps) { // <7>
+  deps.compile('com.mycompany:more-java-javascript-code:1.0.1'); // <8>
+});
+
+project.task('myJavaScriptTask', function(task) { // <9>
+  task.action(function(task) { // <10>
+    print("I am a task.");
+  });
+  task.doLast(function(task) { // <11>
+    print("I do everything too lmao");
+  });
+});
+----
+====
+
+<1> Your terrible JavaScript build file is given access to the `Project` through the `project` variable.
+<2> You can configure your build script's repos and shit.
+<3> You can even use the shortcuts like `jcenter` and if you're feeling awful about yourself `mavenCentral` and `mavenLocal` too!
+<4> Add dependencies to your build script!
+<5> Apply plugins!
+<6> Configure the repositories for your project using JavaScript functions.
+<7> More functions!! Project dependencies!
+<8> Add shit to your project configurations!
+<9> Even add tasks to your build!
+<10> Special use case: `task.action(function(task) {...})` adds an explicit action.
+<11> Even do things like `doLast` and all that other `Task` shit you do.
+
+== But then what?
+
+Just run that shit.
+
+.Run that shit.
+====
+[source,text]
+----
+$ ./gradlew myJavaScriptTask
+:compileJava UP-TO-DATE
+:processResources UP-TO-DATE
+:classes UP-TO-DATE
+:compileTestJava UP-TO-DATE
+:myJavaScriptTask
+I am a task.
+I do everything too lmao
+
+BUILD SUCCESSFUL
+
+Total time: 31.306 secs
+
+This build could be faster, please consider using the Gradle Daemon: https://docs.gradle.org/2.14/userguide/gradle_daemon.html
+
+$
+----
+====
+
+There you go.
+
+== Is this for real?
+
+Fuck yes it is. Go look at the fucking tests.
+
+== License?
+
+I don't know. Just take it, who cares.
+
+== Authors
+
+https://twitter.com/danveloper[@danveloper]
+
+== When?
+
+June 21, 2016

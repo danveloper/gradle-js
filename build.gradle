@@ -1,0 +1,18 @@
+apply plugin: 'groovy'
+apply plugin: 'java-gradle-plugin'
+apply plugin: 'idea'
+
+repositories {
+  jcenter()
+}
+
+group = "com.github.danveloper.gradle.plugins"
+version = "1.0.0"
+
+dependencies {
+  compile gradleApi()
+  testCompile gradleTestKit()
+  testCompile("org.spockframework:spock-core:1.0-groovy-2.4") {
+    exclude module: 'groovy-all'
+  }
+}
