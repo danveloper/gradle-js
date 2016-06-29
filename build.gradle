@@ -36,11 +36,13 @@ artifactory {
   contextUrl = 'http://oss.jfrog.org'
 }
 
+ext.isSnapshot = version.endsWith('-SNAPSHOT')
+
 artifactoryPublish { task ->
   rootProject.artifactory {
     publish {
       repository {
-        repoKey = version.endsWith("-SNAPSHOT") ? 'oss-snapshot-local' : 'oss-release-local'
+        repoKey = isSnapshot ? 'oss-snapshot-local' : 'oss-release-local'
         gradle.taskGraph.whenReady { taskGraph ->
           if (taskGraph.hasTask(task)) {
             username = bintrayUser
@@ -69,9 +71,21 @@ publishing {
   }
 }
 
+bintrayUpload { task ->
+  doFirst {
+    if (isSnapshot) {
+      throw new GradleException('Cannot publish SNAPSHOT versions to BinTray!')
+    }
+  }
+  gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(task)) {
+      task.user = bintrayUser
+      task.apiKey = bintrayKey
+    }
+  }
+}
+
 bintray {
-  user = bintrayUser
-  key = bintrayKey
   publish = true
   dryRun = false
   pkg {
