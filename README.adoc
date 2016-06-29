@@ -20,7 +20,7 @@ Easy as fuck.
 ----
 buildscript {
   repositories { jcenter() }
-  dependencies { classpath 'com.danveloper.github:gradle-js:1.0.1' }
+  dependencies { classpath 'com.danveloper.github:gradle-js:1.0.2' }
 }
 apply plugin: 'js-build'
 ----
@@ -54,7 +54,7 @@ project.repositories(function(repos) { // <6>
 });
 
 project.dependencies(function(deps) { // <7>
-  deps.compile('com.mycompany:more-java-javascript-code:1.0.1'); // <8>
+  deps.compile('com.mycompany:more-java-javascript-code:1.0.2'); // <8>
 });
 
 project.task('myJavaScriptTask', function(task) { // <9>
