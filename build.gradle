@@ -1,6 +1,19 @@
+buildscript {
+  repositories { 
+    jcenter() 
+  }
+  dependencies {
+    classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:2.2.3'
+  }
+}
+
 apply plugin: 'groovy'
 apply plugin: 'java-gradle-plugin'
 apply plugin: 'idea'
+apply plugin: 'artifactory'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: 'artifactory'
 
 repositories {
   jcenter()
@@ -15,4 +28,58 @@ dependencies {
   testCompile("org.spockframework:spock-core:1.0-groovy-2.4") {
     exclude module: 'groovy-all'
   }
+}
+
+artifactory {
+  contextUrl = 'http://oss.jfrog.org'
+}
+
+artifactoryPublish { task ->
+  rootProject.artifactory {
+    publish {
+      repository {
+        repoKey = version.endsWith("-SNAPSHOT") ? 'oss-snapshot-local' : 'oss-release-local'
+        gradle.taskGraph.whenReady { taskGraph ->
+          if (taskGraph.hasTask(task)) {
+            username = bintrayUser
+            password = bintrayKey
+          }
+        }
+      }
+    }
+  }
+}
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allJava
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+
+      artifact sourceJar {
+        classifier "sources"
+      }
+    }
+
+  }
+}
+
+task bintrayPublish << {
+  if (!(bintrayUser && bintrayKey)) {
+    throw new InvalidUserDataException("You must provide bintrayUser and bintrayKey")
+  }
+
+  if (!project.hasProperty('buildNumber')) {
+    throw new GradleException("Must provide buildNumber of a release binary from oss.jfrog.org")
+  }
+
+  def baseUrl = 'https://oss.jfrog.org/api/plugins/build/promote/releaseToBintray/danveloper/'
+  def params = '?params=org=danveloper|repo=maven|package=gradle-js'
+  def curlUrl = [baseUrl, project.buildNumber, params].join('')
+  def curl = ['curl', '-X', 'POST', '-u',
+              /"${bintrayUser}:${bintrayKey}"/, curlUrl].execute()
+  logger.info("Received response: ${curl.text}")
 }
