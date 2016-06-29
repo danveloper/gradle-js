@@ -18,19 +18,21 @@ Easy as fuck.
 ====
 [source,groovy]
 ----
-plugins {
-  id 'js-builds' version '1.0.0'
+buildscript {
+  repositories { jcenter() }
+  dependencies { classpath 'com.danveloper.github:gradle-js:1.0.1' }
 }
+apply plugin: 'js-build'
 ----
 ====
 
-Boom that's it. (Well, it will be if I ever decide to publish this somewhere.)
+Boom that's it.
 
 == Then what?
 
 JavaScript the fuck out of your project.
 
- - You need a `build.js` file in your project root.
+ - You need a `gradle.js` file in your project root.
 
 .And this needs all the complicated JavaScript you can fathom.
 ====
