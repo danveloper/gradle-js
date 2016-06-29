@@ -107,4 +107,28 @@ class JsBuildPluginSpec extends PluginSpecification {
     result.output.contains("doLast worked")
     result.task(":myTask").outcome == TaskOutcome.SUCCESS
   }
+
+  void 'should be able to affect the buildscript'() {
+    setup:
+    def project = buildJs("""
+      project.buildscript(function(bs) {
+        bs.repositories(function(repos) {
+          repos.jcenter();
+        });
+        bs.dependencies(function(deps) {
+          deps.classpath('io.ratpack:ratpack-gradle:1.3.3');
+        });
+      });
+    """)
+
+    when:
+    project.plugins.apply(JsBuildPlugin)
+
+    then:
+    project.buildscript.repositories.getByName('BintrayJCenter')
+    project.buildscript.configurations["classpath"].dependencies.size() == 1
+    project.buildscript.configurations["classpath"].dependencies[0].group == 'io.ratpack'
+    project.buildscript.configurations["classpath"].dependencies[0].name == 'ratpack-gradle'
+    project.buildscript.configurations["classpath"].dependencies[0].version == '1.3.3'
+  }
 }

@@ -7,6 +7,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.dsl.ArtifactHandler
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.initialization.dsl.ScriptHandler
 
@@ -31,8 +32,8 @@ class BetterProject {
     fn.execute(project.getConfigurations())
   }
 
-  void buildscript(Action<ScriptHandler> fn) {
-    fn.execute(project.getBuildscript())
+  void buildscript(Action<BetterScriptHandler> fn) {
+    fn.execute(new BetterScriptHandler(delegate: project.buildscript))
   }
 
   void repositories(Action<RepositoryHandler> fn) {
@@ -51,6 +52,24 @@ class BetterProject {
   void task(String taskName, SweeterAction<Task> fn) {
     def task = project.tasks.create(taskName)
     fn.execute(new BetterTask(task: task));
+  }
+
+  static class BetterScriptHandler {
+    @Delegate
+    ScriptHandler delegate
+
+    void repositories(Action<RepositoryHandler> action) {
+      action.execute(getRepositories())
+    }
+
+    void dependencies(Action<JSObject> action) {
+      action.execute(new AbstractJSObject() {
+        @Override
+        Object getMember(String name) {
+          new DelegatingObject(method: name, handler: delegate.dependencies)
+        }
+      })
+    }
   }
 
   static class BetterTask {
